@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 #include <iostream>
+#include <string>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -10,8 +12,6 @@
 using namespace std;
 
 char digits[9] = { '1','2','3','4','5','6','7','8','9' };
-//char cols[9] = { '1','2','3','4','5','6','7','8','9' };
-//char rows[9] = { 'A','B','C','D','E','F','G','H','I' };
 string cols = "123456789";
 string rows = "ABCDEFGHI";
 string colChunks[3] = { "123", "456", "789" };
@@ -34,7 +34,7 @@ int main()
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Invalid input.  Try again: ";
 	}
-	cout << "You enterd: " << numPuzzles << endl;
+	cout << "You entered: " << numPuzzles << endl;
 
 	for (size_t i = 0; i < numPuzzles; i++)
 	{
@@ -42,14 +42,99 @@ int main()
 	}
 }
 
-//Lucas
-char** RandomPuzzle() {
-
-
-}
-
-
 namespace Solver {
+
+	void SolveSudoku(int puzzleNum) {
+
+
+	}
+
+	vector<vector<char>> RandomPuzzle() {
+
+		int n = 17;
+		map<string, string> values;
+
+		for (string s : squares) {
+
+			values[s] = string(digits);
+		}
+
+		for (string s : squares) {
+
+			int rando = rand() % 9 + 1;
+
+			if (Solver::Assign(values, s, to_string(rando)).empty()) {
+
+				break;
+			}
+
+			if (values.find(s)->second.length() == 1) {
+
+				map<string, string> ds;
+				for (string s1 : squares) {
+
+					string valueTemp = values.find(s1)->second;
+					if (valueTemp.length() == 1) {
+
+						ds[s1] = valueTemp;
+					}
+				}
+
+				if (ds.size() >= n) {
+
+					unordered_set<string> set;
+					for (string s1 : squares) {
+
+						if (set.size >= 8) { break; }
+
+						if (ds.find(s1) != ds.end() && (ds.find(s1)->second.length() == 1)) {
+
+							set.insert(ds.find(s1)->second);
+						}
+					}
+
+					if (set.size() >= 8) {
+
+						if (values.find(s)->second.length() == 1) {
+
+							map<string, char> tmp;
+							for (string s1 : squares) {
+
+								if (ds.find(s1) != ds.end() && ds.find(s1)->second.length() == 1) {
+
+									char charTemp = ds.find(s1)->second.at(0);
+									tmp[s1] = charTemp;
+								}
+								else {
+
+									tmp[s1] = '.';
+								}
+							}
+
+							vector<vector<char>> outerino; //CHECK HOW SQUARES IS ORGANIZED
+							vector<char> hold;
+
+							for (string s1 : squares) {
+
+								hold.push_back(tmp.find(s1)->second);
+
+								if (hold.size() == 9) {
+
+									outerino.push_back(hold);
+									hold.clear();
+								}
+							}
+
+							return outerino;
+						}
+					}
+				}
+			}
+		}
+
+		return RandomPuzzle();
+	}
+
 
 	//started 
 	void SolveSudoku(int puzzleNum) {
@@ -175,7 +260,7 @@ namespace Solver {
 			string d2 = values[s];
 			for (string s2 : peers[s]) {
 
-				if (Eliminate(values, s2, d2).empty()) {
+				if (Solver::Eliminate(values, s2, d2).empty()) {
 
 					return;
 				}
@@ -203,7 +288,7 @@ namespace Solver {
 			else if (dplaces.size() == 1) {
 
 				// If there is exactly one place it can go, try to assign it to that spot and eliminate other values
-				if (Assign(values, dplaces[0], d).empty()) {
+				if (Solver::Assign(values, dplaces[0], d).empty()) {
 
 					return;
 				}
@@ -216,8 +301,10 @@ namespace Solver {
 	//Finished, not tested
 	map<string, string> Search(map<string, string> values) {
 		
-		if (values.empty())
+		if (values.empty()) {
+		
 			return;
+		}
 
 		// If we have 81 squares with one digit each, we have a completed puzzle
 		int tally = 0;
@@ -254,11 +341,11 @@ namespace Solver {
 		for (char d : values[sq]) {
 
 			map<string, string> valCopy = values;
-			searchList.push_back(Search(Assign(valCopy, sq, d + "")));
-			return Some(searchList);
+			searchList.push_back(Search(Solver::Assign(valCopy, sq, d + "")));
+			return Solver::Some(searchList);
 		}
 
-		return Some(searchList);
+		return Solver::Some(searchList);
 
 	}
 
@@ -301,11 +388,39 @@ namespace Printer {
 
 	void PrintPuzzle(map<string, string> values, const char* fileName) {
 
+		ofstream puzzleOut;
+		puzzleOut.open(fileName);
 
-	}
+		string coord;
+		for (char r : rows) {
 
-	void PrintSolution(map<string, string> values, const char* fileName) {
+			for (char c : cols) {
 
+				if (c == '1') {
 
+					puzzleOut << " ";
+				}
+
+				coord = ("" + r + c);
+				string temp = values.find(coord)->second;
+
+				puzzleOut << (temp);
+
+				if (c == '3' || c == '6') {
+
+					puzzleOut << ("| ");
+				}
+			}
+
+			puzzleOut << '\n';
+
+			if (r == 'C' || r == 'F') {
+
+				puzzleOut << ("-------+-------+-------");
+			}
+		}
+		puzzleOut << '\n';
+
+		puzzleOut.close();
 	}
 }
