@@ -140,8 +140,8 @@ namespace Solver {
 	void SolveSudoku(int puzzleNum) {
 		
 		//instantiate static variables from the class
-		squares = Cross(rows, cols);
-		unitList = BuildUnitList();
+		squares = Solver::Cross(rows, cols);
+		unitList = Solver::BuildUnitList();
 		map<string, vector<string>> units;
 		for (string s : squares) {
 
@@ -155,13 +155,26 @@ namespace Solver {
 
 					// This is wrong, but I'm not sure how to put a blank vector
 					//units[s] = new vector<string>;
-
 				}
 			}
-
 		}
 
+		map<string, vector<string>> peers;
+		vector<string> tmp;
+		for (string s : squares) {
+			tmp.clear();
+			//units[s].
 
+		//	units.get(s).forEach(tmp::addAll); //What does this do??
+		//	tmp.remove(s);
+			peers[s] = tmp;
+		}
+
+		// Try to make a random puzzle
+		vector<vector<char>> puzzle = Solver::RandomPuzzle();
+
+		//File IO
+		//Not yet implemented from Java code
 	}
 
 	//Finished, not tested
@@ -181,17 +194,17 @@ namespace Solver {
 		vector<vector<string>> u1;
 		for (char c: cols) {
 			
-			u1.push_back(Cross(rows, ("" + c)));
+			u1.push_back(Solver::Cross(rows, ("" + c)));
 		}
 		for (char r: rows) {
 		
-			u1.push_back(Cross(("" + r), cols));
+			u1.push_back(Solver::Cross(("" + r), cols));
 		}
 		for (string cc : colChunks) {
 
 			for (string rc: rowChunks) {
 			
-				u1.push_back(Cross(rc, cc));
+				u1.push_back(Solver::Cross(rc, cc));
 			}
 		}
 		return u1;
@@ -231,7 +244,7 @@ namespace Solver {
 		// If we get a contradiction, go back and try another starting value
 		for (char d2 : altVals) {
 
-			if (Eliminate(values, s, d2 + "").size() == 0) {
+			if (Solver::Eliminate(values, s, d2 + "").size() == 0) {
 
 				return;
 			}
