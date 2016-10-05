@@ -128,17 +128,31 @@ namespace Solver {
 
 	}
 
+	//finished, untested
 	map<string, string> Assign(map<string, string> values, string s, string d) {
 		// Separate the values we want to eliminate (seems backwards, I know.)
 		string altVals = values[s];
-		if ((altVals.find(d) != std::string::npos)) {
-
-			//so long as d is only ever a single char, this'll work
-			altVals.erase(pointer to d);
+		std::size_t found = altVals.find(d);
+		if (found != std::string::npos) {
+			//found is the index of that char
+			altVals.erase(altVals.begin() + found);
 
 		}
-		
+		else {
 
+			return;
+		}
+		
+		// If we get a contradiction, go back and try another starting value
+		for (char d2 : altVals) {
+
+			if (Eliminate(values, s, d2 + "").size() == 0) {
+
+				return;
+			}
+		}
+
+		return values;
 	}
 
 	//Finished, especially untested.
