@@ -51,7 +51,30 @@ char** RandomPuzzle() {
 
 namespace Solver {
 
+	//started 
 	void SolveSudoku(int puzzleNum) {
+		
+		//instantiate static variables from the class
+		squares = Cross(rows, cols);
+		unitList = BuildUnitList();
+		map<string, vector<string>> units;
+		for (string s : squares) {
+
+			for (vector<string> u : unitList) {
+
+				if (std::find(u.begin(), u.end(), s) != u.end()) {
+
+					units[s] = u;
+				}
+				else {
+
+					// This is wrong, but I'm not sure how to put a blank vector
+					//units[s] = new vector<string>;
+
+				}
+			}
+
+		}
 
 
 	}
@@ -107,7 +130,14 @@ namespace Solver {
 
 	map<string, string> Assign(map<string, string> values, string s, string d) {
 		// Separate the values we want to eliminate (seems backwards, I know.)
-		string atVals = values[s];
+		string altVals = values[s];
+		if ((altVals.find(d) != std::string::npos)) {
+
+			//so long as d is only ever a single char, this'll work
+			altVals.erase(pointer to d);
+
+		}
+		
 
 	}
 
