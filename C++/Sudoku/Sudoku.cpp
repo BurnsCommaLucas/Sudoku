@@ -3,6 +3,8 @@
 
 #include "stdafx.h"
 #include <iostream>
+#include <string>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <unordered_set>
@@ -31,7 +33,7 @@ int main()
 		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 		cout << "Invalid input.  Try again: ";
 	}
-	cout << "You enterd: " << numPuzzles << endl;
+	cout << "You entered: " << numPuzzles << endl;
 
 	for (size_t i = 0; i < numPuzzles; i++)
 	{
@@ -40,17 +42,97 @@ int main()
 }
 
 
-char** RandomPuzzle() {
-
-
-}
-
-
 namespace Solver {
 
 	void SolveSudoku(int puzzleNum) {
 
 
+	}
+
+	vector<vector<char>> RandomPuzzle() {
+
+		int n = 17;
+		map<string, string> values;
+
+		for (string s : squares) {
+
+			values[s] = string(digits);
+		}
+
+		for (string s : squares) {
+
+			int rando = rand() % 9 + 1;
+
+			if (Solver::Assign(values, s, to_string(rando)).empty()) {
+
+				break;
+			}
+
+			if (values.find(s)->second.length() == 1) {
+
+				map<string, string> ds;
+				for (string s1 : squares) {
+
+					string valueTemp = values.find(s1)->second;
+					if (valueTemp.length() == 1) {
+
+						ds[s1] = valueTemp;
+					}
+				}
+
+				if (ds.size() >= n) {
+
+					unordered_set<string> set;
+					for (string s1 : squares) {
+
+						if (set.size >= 8) { break; }
+
+						if (ds.find(s1) != ds.end() && (ds.find(s1)->second.length() == 1)) {
+
+							set.insert(ds.find(s1)->second);
+						}
+					}
+
+					if (set.size() >= 8) {
+
+						if (values.find(s)->second.length() == 1) {
+
+							map<string, char> tmp;
+							for (string s1 : squares) {
+
+								if (ds.find(s1) != ds.end() && ds.find(s1)->second.length() == 1) {
+
+									char charTemp = ds.find(s1)->second.at(0);
+									tmp[s1] = charTemp;
+								}
+								else {
+
+									tmp[s1] = '.';
+								}
+							}
+
+							vector<vector<char>> outerino; //CHECK HOW SQUARES IS ORGANIZED
+							vector<char> hold;
+
+							for (string s1 : squares) {
+
+								hold.push_back(tmp.find(s1)->second);
+
+								if (hold.size() == 9) {
+
+									outerino.push_back(hold);
+									hold.clear();
+								}
+							}
+
+							return outerino;
+						}
+					}
+				}
+			}
+		}
+
+		return RandomPuzzle();
 	}
 
 	vector<string> Cross(char* c1, char* c2) {
@@ -113,11 +195,39 @@ namespace Printer {
 
 	void PrintPuzzle(map<string, string> values, const char* fileName) {
 
+		ofstream puzzleOut;
+		puzzleOut.open(fileName);
 
-	}
+		string coord;
+		for (char r : rows) {
 
-	void PrintSolution(map<string, string> values, const char* fileName) {
+			for (char c : cols) {
 
+				if (c == '1') {
 
+					puzzleOut << " ";
+				}
+
+				coord = ("" + r + c);
+				string temp = values.find(coord)->second;
+
+				puzzleOut << (temp);
+
+				if (c == '3' || c == '6') {
+
+					puzzleOut << ("| ");
+				}
+			}
+
+			puzzleOut << '\n';
+
+			if (r == 'C' || r == 'F') {
+
+				puzzleOut << ("-------+-------+-------");
+			}
+		}
+		puzzleOut << '\n';
+
+		puzzleOut.close();
 	}
 }
