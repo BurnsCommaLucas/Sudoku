@@ -136,13 +136,13 @@ namespace Solver {
 	}
 
 
-	//started 
+	//Done, except FileIO 
 	void SolveSudoku(int puzzleNum) {
 		
 		//instantiate static variables from the class
-		squares = Cross(rows, cols);
-		unitList = BuildUnitList();
-		map<string, vector<string>> units;
+		squares = Solver::Cross(rows, cols);
+		unitList = Solver::BuildUnitList();
+		std::map<std::string, std::vector<string>> units;
 		for (string s : squares) {
 
 			for (vector<string> u : unitList) {
@@ -152,21 +152,37 @@ namespace Solver {
 					units[s] = u;
 				}
 				else {
-
-					// This is wrong, but I'm not sure how to put a blank vector
-					//units[s] = new vector<string>;
-
+					vector<string> tempVec;
+					units[s] = tempVec;
 				}
 			}
-
 		}
 
+		std::map<string, unordered_set<string>> peers;
+		std::unordered_set<string> tmp;
+		for (string s : squares) {
+			tmp.clear();
+			//Really not sure that I did this right
+			if (units.size() > 0) {
+				for (string i : units[s]) {
+					tmp.insert(i);
+				}
+			}
+			// Also not sure about this...
+			tmp.erase(s);
+			peers[s] = tmp;
+		}
 
+		// Try to make a random puzzle
+		std::vector<vector<char>> puzzle = Solver::RandomPuzzle();
+
+		//File IO
+		// THIS NEEDS TO BE IMPLEMENTED 
 	}
 
 	//Finished, not tested
 	vector<string> Cross(string c1, string c2) {
-		vector<string> out;
+		std::vector<string> out;
 		for (char i : c1) {
 
 			for (char j : c2)
@@ -178,20 +194,20 @@ namespace Solver {
 
 	//finished, not tested
 	vector<vector<string>> BuildUnitList() {
-		vector<vector<string>> u1;
+		std::vector<vector<string>> u1;
 		for (char c: cols) {
 			
-			u1.push_back(Cross(rows, ("" + c)));
+			u1.push_back(Solver::Cross(rows, ("" + c)));
 		}
 		for (char r: rows) {
 		
-			u1.push_back(Cross(("" + r), cols));
+			u1.push_back(Solver::Cross(("" + r), cols));
 		}
 		for (string cc : colChunks) {
 
 			for (string rc: rowChunks) {
 			
-				u1.push_back(Cross(rc, cc));
+				u1.push_back(Solver::Cross(rc, cc));
 			}
 		}
 		return u1;
@@ -204,7 +220,7 @@ namespace Solver {
 		else {
 
 			// Make a copy of the thing to shuffle (so we don't mess up the original)
-			vector<string> copy = seq;
+			std::vector<string> copy = seq;
 			std::random_shuffle (copy.begin(), copy.end());
 			return copy;
 		}
@@ -216,7 +232,7 @@ namespace Solver {
 	//finished, untested
 	map<string, string> Assign(map<string, string> values, string s, string d) {
 		// Separate the values we want to eliminate (seems backwards, I know.)
-		string altVals = values[s];
+		std::string altVals = values[s];
 		std::size_t found = altVals.find(d);
 		if (found != std::string::npos) {
 			//found is the index of that char
@@ -231,7 +247,7 @@ namespace Solver {
 		// If we get a contradiction, go back and try another starting value
 		for (char d2 : altVals) {
 
-			if (Eliminate(values, s, d2 + "").size() == 0) {
+			if (Solver::Eliminate(values, s, d2 + "").size() == 0) {
 
 				return;
 			}
@@ -247,7 +263,6 @@ namespace Solver {
 			return values;
 		}
 
-		//values.put(s, values.get(s).replace(d, "")); //Java code
 		values[s] = (d + "");
 		//THE ABOVE LINE MIGHT BE COMPLETELY WRONG
 
@@ -257,7 +272,7 @@ namespace Solver {
 		}
 		else if (values[s].length() == 1) {
 
-			string d2 = values[s];
+			std::string d2 = values[s];
 			for (string s2 : peers[s]) {
 
 				if (Solver::Eliminate(values, s2, d2).empty()) {
@@ -323,7 +338,7 @@ namespace Solver {
 
 		// Search for the sqare with the least possibilities 
 		// (but more than one possible digit)
-		string sq = "A1";
+		std::string sq = "A1";
 		int min = 9;
 		for (string s : squares) {
 
@@ -337,10 +352,10 @@ namespace Solver {
 
 		// Make a copy of all the values and 
 		// try one of the digits in the least populated square
-		vector<map<string, string>> searchList;
+		std::vector<map<string, string>> searchList;
 		for (char d : values[sq]) {
 
-			map<string, string> valCopy = values;
+			std::map<string, string> valCopy = values;
 			searchList.push_back(Search(Solver::Assign(valCopy, sq, d + "")));
 			return Solver::Some(searchList);
 		}
