@@ -19,7 +19,7 @@ string rowChunks[3] = { "ABC", "DEF", "GHI" };
 
 vector<string> squares;
 vector<vector<string>> unitList;
-map<string, vector<vector<string>>> units;
+map<string, vector<vector<string>> units;
 map<string, unordered_set<string>> peers;
 
 
